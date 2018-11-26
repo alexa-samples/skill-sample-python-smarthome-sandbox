@@ -1,0 +1,678 @@
+{
+	"info": {
+		"_postman_id": "64d71249-5722-4b25-aff3-110f6a990b05",
+		"name": "Alexa Smart Home Sample (smarthome-iot)",
+		"description": "REST calls for the sample_backend content available on https://github.com/alexa/alexa-smarthome",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Endpoints",
+			"item": [
+				{
+					"name": "/endpoints",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints?endpoint_name={{endpoint_name}}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints?endpoint_id={{endpoint_id}}",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							],
+							"query": [
+								{
+									"key": "endpoint_id",
+									"value": "{{endpoint_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (Sample Switch - Random)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"capabilities\": [\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.PowerController\",\n                    \"version\": \"3\",\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"powerState\"\n                            }\n                        ],\n                        \"proactivelyReported\": true,\n                        \"retrievable\": true\n                    }\n                }\n            ],\n            \"sku\": \"SW00\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (Black Sample Switch)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"friendlyName\": \"Black Sample Switch\",\n            \"capabilities\": [\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.PowerController\",\n                    \"version\": \"3\",\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"powerState\"\n                            }\n                        ],\n                        \"proactivelyReported\": true,\n                        \"retrievable\": true\n                    }\n                }\n            ],\n            \"sku\": \"SW00\",\n            \"description\": \"A Sample Switch\",\n            \"manufacturerName\": \"Sample Manufacturer\",\n            \"displayCategories\": [\n                \"SWITCH\"\n            ]\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (White Sample Switch)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"friendlyName\": \"White Sample Switch\",\n            \"capabilities\": [\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.PowerController\",\n                    \"version\": \"3\",\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"powerState\"\n                            }\n                        ],\n                        \"proactivelyReported\": true,\n                        \"retrievable\": true\n                    }\n                }\n            ],\n            \"sku\": \"SW01\",\n            \"description\": \"A Sample Switch\",\n            \"manufacturerName\": \"Sample Manufacturer\",\n            \"displayCategories\": [\n                \"SWITCH\"\n            ]\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (Sample Light)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"event\": {\n\t\t\"endpoint\": {\n\t\t\t\"userId\" : \"{{user_id}}\",\n\t\t\t\"friendlyName\": \"Sample Light\",\n\t\t\t\"capabilities\": [\n\t\t\t\t{\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n\t\t\t\t},\t\t\t\t\n\t\t\t\t{\n            \t\t\"type\": \"AlexaInterface\",\n            \t\t\"interface\": \"Alexa.PowerController\",\n            \t\t\"version\": \"3\",\n            \t\t\"properties\": {\n            \t\t\t\"supported\": [\n        \t\t\t\t\t{\n                \t\t\t\t\"name\": \"powerState\"\n                \t\t\t}\n            \t\t\t],\n            \t\t\t\"proactivelyReported\": true,\n            \t\t\t\"retrievable\": true\n        \t\t\t}\n            \t},\n            \t{\n                    \"type\":\"AlexaInterface\",\n                    \"interface\":\"Alexa.ColorController\",\n                    \"version\":\"3\",\n                    \"properties\":{\n                        \"supported\":[\n                           {\n                              \"name\":\"color\"\n                           }\n                        ],\n                        \"proactivelyReported\":true,\n                        \"retrievable\":true\n                    }\n                }\n        \t],\n\t\t\"sku\": \"LI00\",\n\t\t\"description\": \"A Sample Light\",\n\t\t\"manufacturerName\": \"Sample Manufacturer\",\n\t\t\"displayCategories\": [\"LIGHT\"]\n\t\t}\n\t}\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (Sample Toaster)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"friendlyName\": \"Sample Toaster\",\n            \"capabilities\": [\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.RangeController\",\n                    \"version\": \"3\",\n                    \"instance\": \"SampleManufacturer.Endpoint.Heat\",\n                    \"capabilityResources\": {\n                        \"friendlyNames\": [\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Heat\",\n                                    \"locale\": \"en-US\"\n                                }\n                            }\n                        ]\n                    },\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"rangeValue\"\n                            }\n                        ],\n                        \"proactivelyReported\": true,\n                        \"retrievable\": true\n                    },\n                    \"configuration\": {\n                        \"supportedRange\": {\n                            \"minimumValue\": 1,\n                            \"maximumValue\": 7,\n                            \"precision\": 1\n                        },\n                        \"presets\": [\n                            {\n                                \"rangeValue\": 1,\n                                \"presetResources\": {\n                                    \"friendlyNames\": [\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"Light\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        },\n                                        {\n                                            \"@type\": \"asset\",\n                                            \"value\": {\n                                                \"assetId\": \"Alexa.Value.Minimum\"\n                                            }\n                                        }\n                                    ]\n                                }\n                            },\n                            {\n                                \"rangeValue\": 4,\n                                \"presetResources\": {\n                                    \"friendlyNames\": [\n                                        {\n                                            \"@type\": \"asset\",\n                                            \"value\": {\n                                                \"assetId\": \"Alexa.Value.Medium\"\n                                            }\n                                        }\n                                    ]\n                                }\n                            },\n                            {\n                                \"rangeValue\": 7,\n                                \"presetResources\": {\n                                    \"friendlyNames\": [\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"Dark\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        },\n                                        {\n                                            \"@type\": \"asset\",\n                                            \"value\": {\n                                                \"assetId\": \"Alexa.Value.Maximum\"\n                                            }\n                                        }\n                                    ]\n                                }\n                            }\n                        ]\n                    }\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.ToggleController\",\n                    \"version\": \"3\",\n                    \"instance\": \"SampleManufacturer.Toaster.Bagel\",\n                    \"capabilityResources\": {\n                        \"friendlyNames\": [\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Bagel\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Bagel Mode\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Bagel Setting\",\n                                    \"locale\": \"en-US\"\n                                }\n                            }\n                        ]\n                    },\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"toggleState\"\n                            }\n                        ],\n                        \"proactivelyReported\": false,\n                        \"retrievable\": false\n                    }\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.ToggleController\",\n                    \"version\": \"3\",\n                    \"instance\": \"SampleManufacturer.Toaster.Frozen\",\n                    \"capabilityResources\": {\n                        \"friendlyNames\": [\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Frozen\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Frozen Mode\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Frozen Setting\",\n                                    \"locale\": \"en-US\"\n                                }\n                            }\n                        ]\n                    },\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"toggleState\"\n                            }\n                        ],\n                        \"proactivelyReported\": false,\n                        \"retrievable\": false\n                    }\n                }\n            ],\n            \"cookie\": {\n                \"key\": \"value\"\n            },\n            \"sku\": \"OT01\",\n            \"description\": \"A Sample Toaster\",\n            \"manufacturerName\": \"Sample Manufacturer\",\n            \"displayCategories\": [\n                \"OTHER\"\n            ]\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (Sample Coffee Maker)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"friendlyName\": \"Sample Coffee Maker\",\n            \"capabilities\": [\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.ModeController\",\n                    \"version\": \"3\",\n                    \"instance\": \"SampleManufacturer.CoffeeMaker.FillSize\",\n                    \"capabilityResources\": {\n                        \"friendlyNames\": [\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Amount\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Fill Size\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Cup Size\",\n                                    \"locale\": \"en-US\"\n                                }\n                            }\n                        ]\n                    },\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"mode\"\n                            }\n                        ],\n                        \"proactivelyReported\": false,\n                        \"retrievable\": false\n                    },\n                    \"configuration\": {\n                        \"ordered\": true,\n                        \"supportedModes\": [\n                            {\n                                \"value\": \"FillSize.Small\",\n                                \"modeResources\": {\n                                    \"friendlyNames\": [\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"Small\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        },\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"8 ounces\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        }\n                                    ]\n                                }\n                            },\n                            {\n                                \"value\": \"FillSize.Medium\",\n                                \"modeResources\": {\n                                    \"friendlyNames\": [\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"Medium\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        },\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"16 ounces\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        }\n                                    ]\n                                }\n                            },\n                            {\n                                \"value\": \"FillSize.Large\",\n                                \"modeResources\": {\n                                    \"friendlyNames\": [\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"Large\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        },\n                                        {\n                                            \"@type\": \"text\",\n                                            \"value\": {\n                                                \"text\": \"24 ounces\",\n                                                \"locale\": \"en-US\"\n                                            }\n                                        }\n                                    ]\n                                }\n                            }\n                        ]\n                    }\n                },\n                {\n                    \"instance\": \"SampleManufacturer.CoffeeMaker.NightMode\",\n                    \"interface\": \"Alexa.ToggleController\",\n                    \"type\": \"AlexaInterface\",\n                    \"version\": \"3\",\n                    \"capabilityResources\": {\n                        \"friendlyNames\": [\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Dim\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Dim Mode\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Night Mode\",\n                                    \"locale\": \"en-US\"\n                                }\n                            }\n                        ]\n                    },\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"toggleState\"\n                            }\n                        ],\n                        \"proactivelyReported\": false,\n                        \"retrievable\": false\n                    }\n                },\n                {\n                    \"instance\": \"SampleManufacturer.CoffeeMaker.CleanMode\",\n                    \"interface\": \"Alexa.ToggleController\",\n                    \"type\": \"AlexaInterface\",\n                    \"version\": \"3\",\n                    \"capabilityResources\": {\n                        \"friendlyNames\": [\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Clean\",\n                                    \"locale\": \"en-US\"\n                                }\n                            },\n                            {\n                                \"@type\": \"text\",\n                                \"value\": {\n                                    \"text\": \"Clean Mode\",\n                                    \"locale\": \"en-US\"\n                                }\n                            }\n                        ]\n                    },\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"toggleState\"\n                            }\n                        ],\n                        \"proactivelyReported\": false,\n                        \"retrievable\": false\n                    }\n                }\n            ],\n            \"cookie\": {\n                \"key\": \"value\"\n            },\n            \"sku\": \"OT01\",\n            \"description\": \"A Sample Toaster\",\n            \"manufacturerName\": \"Sample Manufacturer\",\n            \"displayCategories\": [\n                \"OTHER\"\n            ]\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (Black Sample Microwave)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"friendlyName\": \"Black Sample Microwave\",\n            \"capabilities\": [\n            \t{\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.Cooking\",\n                    \"version\": \"3\",\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"cookingMode\"\n                            },\n                            {\n                                \"name\": \"cookCompletionTime\"\n                            },\n                            {\n                                \"name\": \"isCookCompletionTimeEstimated\"\n                            },\n                            {\n                                \"name\": \"cookStartTime\"\n                            },\n                            {\n                                \"name\": \"foodItem\"\n                            }\n                        ],\n                        \"proactivelyReported\": true,\n                        \"retrievable\": true\n                    },\n                    \"configuration\": {\n                        \"supportsRemoteStart\": false,\n                        \"supportedCookingModes\": [\n                            \"DEFROST\",\n                            \"REHEAT\",\n                            \"OFF\"\n                        ]\n                    }\n                }\n            ],\n            \"sku\": \"MW00\",\n            \"description\": \"A Sample Kitchen Microwave\",\n            \"manufacturerName\": \"Sample Manufacturer\",\n            \"displayCategories\": [\n                \"MICROWAVE\"\n            ]\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints (White Sample Microwave)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"friendlyName\": \"White Sample Microwave\",\n            \"capabilities\": [\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                },\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa.Cooking\",\n                    \"version\": \"3\",\n                    \"properties\": {\n                        \"supported\": [\n                            {\n                                \"name\": \"cookingMode\"\n                            }\n                        ],\n                        \"retrievable\": true\n                    },\n                    \"configuration\": {\n                        \"supportedCookingModes\": [\n                            \"TIMECOOK\",\n                            \"DEFROST\",\n                            \"REHEAT\",\n                            \"OFF\"\n                        ]\n                    }\n                }\n            ],\n            \"cookie\": {\n                \"key\": \"value\"\n            },\n            \"sku\": \"MW01\",\n            \"description\": \"A Sample White Microwave\",\n            \"manufacturerName\": \"Sample Manufacturer\",\n            \"displayCategories\": [\n                \"MICROWAVE\"\n            ]\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/endpoints",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\"*\"]"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/endpoints?endpoint_id",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"endpoints"
+							],
+							"query": [
+								{
+									"key": "endpoint_id",
+									"value": null
+								}
+							]
+						},
+						"description": "Delete an endpoint. Send an array of endpoints to delete by endpoint ID. Passing * will delete all sample endpoints."
+					},
+					"response": []
+				}
+			],
+			"description": "Methods for creating and manipulating sample Endpoints.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0a1fe37d-2b81-40a4-84e9-f5fc3cc7f188",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "47263632-8d4d-4fd9-9b52-e0ecbfcae19a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Events",
+			"item": [
+				{
+					"name": "/events (ChangeReport)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"type\": \"ChangeReport\",\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"id\": \"SAMPLE_ENDPOINT_000000\",\n            \"state\": \"powerState\",\n            \"value\": \"OFF\",\n            \"type\": \"SWITCH\",\n            \"sku\": \"SW00\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/events",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/events (AddOrUpdateReport)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"type\": \"AddOrUpdateReport\",\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"id\": \"SAMPLE_ENDPOINT_000000\",\n            \"friendlyName\": \"COLOR_SAMPLE_ENDPOINT\",\n            \"sku\": \"SW00\",\n            \"capabilities\": [\n                {\n                    \"type\": \"AlexaInterface\",\n                    \"interface\": \"Alexa\",\n                    \"version\": \"3\"\n                }\n            ]\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/events",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/events (DeleteReport)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"event\": {\n        \"type\": \"DeleteReport\",\n        \"endpoint\": {\n            \"userId\": \"{{user_id}}\",\n            \"id\": \"ENDPOINT_ID\",\n            \"state\": \"OFF\",\n            \"type\": \"SWITCH\",\n            \"sku\": \"SW00\"\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/events",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"events"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Method for sending endpoint cloud events.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "bbef343f-f669-4e63-93f0-67f0360544ee",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c23116a6-9ebf-4f01-a5ce-a9e1162fb626",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Directives",
+			"item": [
+				{
+					"name": "/directives (TurnOn)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"directive\": {\n        \"header\": {\n            \"namespace\": \"Alexa.PowerController\",\n            \"name\": \"TurnOn\",\n            \"payloadVersion\": \"3\",\n            \"messageId\": \"1bd5d003-31b9-476f-ad03-71d471922820\",\n            \"correlationToken\": \"dFMb0z+PgpgdDmluhJ1LddFvSqZ/jCc8ptlAKulUj90jSqg==\"\n        },\n        \"endpoint\": {\n            \"scope\": {\n                \"type\": \"BearerToken\",\n                \"token\": \"access-token-from-skill\"\n            },\n            \"endpointId\": \"black_switch\",\n            \"cookie\": {}\n        },\n        \"payload\": {}\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/directives",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"directives"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/directives (TurnOff)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"directive\": {\r\n        \"header\": {\r\n            \"namespace\": \"Alexa.PowerController\",\r\n            \"name\": \"TurnOff\",\r\n            \"payloadVersion\": \"3\",\r\n            \"messageId\": \"1bd5d003-31b9-476f-ad03-71d471922820\",\r\n            \"correlationToken\": \"dFMb0z+PgpgdDmluhJ1LddFvSqZ/jCc8ptlAKulUj90jSqg==\"\r\n        },\r\n        \"endpoint\": {\r\n            \"scope\": {\r\n                \"type\": \"BearerToken\",\r\n                \"token\": \"access-token-from-skill\"\r\n            },\r\n            \"endpointId\": \"black_switch\",\r\n            \"cookie\": {}\r\n        },\r\n        \"payload\": {}\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/directives",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"directives"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/directives (ReportState)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"directive\": {\r\n    \"header\": {\r\n      \"namespace\": \"Alexa\",\r\n      \"name\": \"ReportState\",\r\n      \"payloadVersion\": \"3\",\r\n      \"messageId\": \"1bd5d003-31b9-476f-ad03-71d471922820\",\r\n      \"correlationToken\": \"dFMb0z+PgpgdDmluhJ1LddFvSqZ/jCc8ptlAKulUj90jSqg==\"\r\n    },\r\n    \"endpoint\": {\r\n      \"endpointId\": \"{{endpoint_name}}\"\r\n    },\r\n    \"payload\": {}\r\n  }\r\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/directives",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"directives"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/directives (Discover)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"directive\": {\n        \"header\": {\n            \"namespace\": \"Alexa.Discovery\",\n            \"name\": \"Discover\",\n            \"payloadVersion\": \"3\",\n            \"messageId\": \"1bd5d003-31b9-476f-ad03-71d471922820\"\n        },\n        \"payload\": {\n            \"scope\": {\n                \"type\": \"BearerToken\",\n                \"token\": \"access-token-from-skill\"\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/directives",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"directives"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/directives (AcceptGrant)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"directive\": {\r\n        \"header\": {\r\n            \"namespace\": \"Alexa.Authorization\",\r\n            \"name\": \"AcceptGrant\",\r\n            \"payloadVersion\": \"3\",\r\n            \"messageId\": \"1bd5d003-31b9-476f-ad03-71d471922820\",\r\n            \"correlationToken\": \"dFMb0z+PgpgdDmluhJ1LddFvSqZ/jCc8ptlAKulUj90jSqg==\"\r\n        },\r\n        \"payload\": {\r\n            \"grant\": {\r\n                \"type\": \"OAuth2.AuthorizationCode\",\r\n                \"code\": \"ANUbUKCJqlBOpMhwYWxU\"\r\n            },\r\n            \"grantee\": {\r\n                \"type\": \"BearerToken\",\r\n                \"token\": \"access-token-from-skill\"\r\n            }\r\n        }\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "https://{{endpoint_api_id}}.execute-api.{{aws_region}}.amazonaws.com/prod/directives",
+							"protocol": "https",
+							"host": [
+								"{{endpoint_api_id}}",
+								"execute-api",
+								"{{aws_region}}",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"prod",
+								"directives"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Methods for sending sample directives."
+		}
+	]
+}

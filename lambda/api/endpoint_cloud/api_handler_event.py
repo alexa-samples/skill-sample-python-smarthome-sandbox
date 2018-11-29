@@ -44,6 +44,8 @@ class ApiHandlerEvent:
 
             # Get the Access Token
             token = self.get_user_info(endpoint_user_id)
+
+            # Build a default response
             response = AlexaResponse(name='ErrorResponse', message="No valid event type")
 
             if event_type == 'AddOrUpdateReport':
@@ -78,7 +80,7 @@ class ApiHandlerEvent:
                     state = json_object['event']['endpoint']['state']  # Expect a string, ex: powerState
                     state_value = json_object['event']['endpoint']['value']  # Expect string or JSON
 
-                    # TODO Update the IoT Thing Shadow state
+                    # Update the IoT Thing Shadow state
                     msg = {
                         'state': {
                             'desired':
@@ -88,23 +90,11 @@ class ApiHandlerEvent:
                         }
                     }
                     mqtt_msg = json.dumps(msg)
-                    response = iot_data_aws.update_thing_shadow(
+                    result = iot_data_aws.update_thing_shadow(
                         thingName=endpoint_id,
                         payload=mqtt_msg.encode())
-                    print('LOG event.create.iot_aws.update_thing_shadow.response -----')
-                    print(response)
-
-                    # response = iot_aws.update_thing(
-                    #     thingName=endpoint_id,
-                    #     attributePayload={
-                    #         'attributes': {
-                    #             'state': endpoint_state,
-                    #             'user_id': endpoint_user_id
-                    #         }
-                    #     }
-                    # )
-                    # print('LOG event.create.iot_aws.update_thing.response -----')
-                    # print(response)
+                    print('LOG event.create.iot_aws.update_thing_shadow.result -----')
+                    print(result)
 
                     # Update Alexa with an Event Update
                     if endpoint_user_id == '0':
@@ -116,14 +106,12 @@ class ApiHandlerEvent:
                                     'type': 'PHYSICAL_INTERACTION'
                                 },
                                 "properties": [
-                                    AlexaResponse.create_context_property(name='powerState', value='ON')
+                                    AlexaResponse.create_context_property(name=state, value=state_value)
                                 ]
                             }
                         }
                         print('LOG Event: Sending event')
-                        return self.send_event('Alexa', 'ChangeReport', endpoint_id, token, payload)
-
-                    return response
+                        response = self.send_event('Alexa', 'ChangeReport', endpoint_id, token, payload)
 
                 except ClientError as e:
                     alexa_response = AlexaResponse(name='ErrorResponse', message=e, payload={'type': 'INTERNAL_ERROR', 'message': e})
@@ -144,7 +132,6 @@ class ApiHandlerEvent:
                 }
                 response = self.send_event('Alexa.Discovery', 'DeleteReport', endpoint_id, token, payload)
 
-            # print('response', response.read().decode('utf-8'))
             result = response.read().decode('utf-8')
             print('LOG event.create.result -----')
             print(result)
@@ -260,7 +247,8 @@ class ApiHandlerEvent:
     @staticmethod
     def send_event(alexa_namespace, alexa_name, endpoint_id, token, payload):
 
-        alexa_response = AlexaResponse(namespace=alexa_namespace, name=alexa_name, endpoint_id=endpoint_id, token=token, remove_endpoint=True)
+        remove_endpoint = alexa_name is not "ChangeReport"
+        alexa_response = AlexaResponse(namespace=alexa_namespace, name=alexa_name, endpoint_id=endpoint_id, token=token, remove_endpoint=remove_endpoint)
         alexa_response.set_payload(payload)
         payload = json.dumps(alexa_response.get())
         print('LOG api_handler_event.send_event.payload:')
@@ -277,5 +265,5 @@ class ApiHandlerEvent:
         }
         connection.request('POST', '/v3/events', payload, headers)
         response = connection.getresponse()
-        print('LOG PSU HTTP Status code: ' + str(response.getcode()))
+        print('LOG api_handler_event.send_event HTTP Status code: ' + str(response.getcode()))
         return response

@@ -36,7 +36,7 @@ class ApiHandlerDirective:
         return value
 
     def process(self, request, client_id, client_secret, redirect_uri):
-        print('LOG directive.process -----')
+        print('LOG api_handler_directive.process -----')
         # print(json.dumps(request))
 
         response = None
@@ -44,7 +44,6 @@ class ApiHandlerDirective:
         # Only process if there is an actual body to process otherwise return an ErrorResponse
         json_body = request['body']
         if json_body:
-
             json_object = json.loads(json_body)
             namespace = json_object['directive']['header']['namespace']
 
@@ -84,16 +83,22 @@ class ApiHandlerDirective:
                     # Get the User ID
                     response_user_id = json.loads(ApiAuth.get_user_id(grantee_token).read().decode('utf-8'))
                     if 'error' in response_user_id:
-                        print('ERROR directive.process.authorization.user_id:', response_user_id['error_description'])
-                    user_id = response_user_id['user_id']
-                    print('LOG directive.process.authorization.user_id:', user_id)
+                        print('ERROR api_handler_directive.process.authorization.user_id:', response_user_id['error_description'])
+                        return AlexaResponse(name='ErrorResponse', payload={'type': 'INTERNAL_ERROR', 'message': response_user_id})
 
-                    # Get the Access and Refresh Tokens
-                    api_auth = ApiAuth()
-                    response_token = api_auth.get_access_token(grant_code, client_id, client_secret, redirect_uri)
-                    response_token_string = response_token.read().decode('utf-8')
-                    print('LOG directive.process.authorization.response_token_string:', response_token_string)
-                    response_object = json.loads(response_token_string)
+                    user_id = response_user_id['user_id']
+                    print('LOG api_handler_directive.process.authorization.user_id:', user_id)
+
+                # Get the Access and Refresh Tokens
+                api_auth = ApiAuth()
+                print('grant_code', grant_code, 'client_id', client_id, 'client_secret', client_secret, 'redirect_uri', redirect_uri)
+                response_token = api_auth.get_access_token(grant_code, client_id, client_secret, redirect_uri)
+                response_token_string = response_token.read().decode('utf-8')
+                print('LOG api_handler_directive.process.authorization.response_token_string:', response_token_string)
+                response_object = json.loads(response_token_string)
+
+                if 'error' in response_object:
+                    return AlexaResponse(name='ErrorResponse', payload={'type': 'INTERNAL_ERROR', 'response_object': response_object})
 
                 # Store the retrieved from the Authorization Server
                 access_token = response_object['access_token']
@@ -122,13 +127,12 @@ class ApiHandlerDirective:
                 )
 
                 if result['ResponseMetadata']['HTTPStatusCode'] == 200:
-                    print('LOG directive.process.authorization.SampleUsers.put_item:', result)
+                    print('LOG api_handler_directive.process.authorization.SampleUsers.put_item:', result)
                     alexa_accept_grant_response = AlexaResponse(namespace='Alexa.Authorization', name='AcceptGrant.Response')
                     response = alexa_accept_grant_response.get()
-
                 else:
                     error_message = 'Error creating User'
-                    print('ERR directive.process.authorization', error_message)
+                    print('ERR api_handler_directive.process.authorization', error_message)
                     alexa_error_response = AlexaResponse(name='ErrorResponse')
                     alexa_error_response.set_payload({'type': 'INTERNAL_ERROR', 'message': error_message})
                     response = alexa_error_response.get()
@@ -148,14 +152,14 @@ class ApiHandlerDirective:
 
                 # Spot the default from the Alexa.Discovery sample. Use as a default for development.
                 if access_token == 'access-token-from-skill':
-                    print('WARN directive.process.discovery.user_id: Using development user_id of 0')
+                    print('WARN api_handler_directive.process.discovery.user_id: Using development user_id of 0')
                     user_id = "0"  # <- Useful for development
                 else:
                     response_user_id = json.loads(ApiAuth.get_user_id(access_token).read().decode('utf-8'))
                     if 'error' in response_user_id:
-                        print('ERROR directive.process.discovery.user_id: ' + response_user_id['error_description'])
+                        print('ERROR api_handler_directive.process.discovery.user_id: ' + response_user_id['error_description'])
                     user_id = response_user_id['user_id']
-                    print('LOG directive.process.discovery.user_id:', user_id)
+                    print('LOG api_handler_directive.process.discovery.user_id:', user_id)
 
                 adr = AlexaResponse(namespace='Alexa.Discovery', name='Discover.Response')
 
@@ -172,7 +176,7 @@ class ApiHandlerDirective:
                             # We have an endpoint thing!
                             endpoint_details = ApiHandlerEndpoint.EndpointDetails()
                             endpoint_details.id = str(thing['thingName'])
-                            print('LOG directive.process.discovery: Found:', endpoint_details.id, 'for user:', user_id)
+                            print('LOG api_handler_directive.process.discovery: Found:', endpoint_details.id, 'for user:', user_id)
                             result = dynamodb_aws.get_item(TableName='SampleEndpointDetails', Key={'EndpointId': {'S': endpoint_details.id}})
                             capabilities_string = self.get_db_value(result['Item']['Capabilities'])
                             endpoint_details.capabilities = json.loads(capabilities_string)
@@ -200,46 +204,35 @@ class ApiHandlerDirective:
 
                 response_user_id = json.loads(ApiAuth.get_user_id(token).read().decode('utf-8'))
                 if 'error' in response_user_id:
-                    print('ERROR directive.process.power_controller.user_id: ' + response_user_id['error_description'])
+                    print('ERROR api_handler_directive.process.power_controller.user_id: ' + response_user_id['error_description'])
                 user_id = response_user_id['user_id']
-                print('LOG directive.process.power_controller.user_id:', user_id)
+                print('LOG api_handler_directive.process.power_controller.user_id:', user_id)
 
                 # Convert to a local stored state
                 power_state_value = 'OFF' if name == "TurnOff" else 'ON'
-                try:
-                    # Send the state to the Thing Shadow
-                    msg = {
-                        'state': {
-                            'desired':
-                                {
-                                    'state': 'ON'
-                                }
-                        }
+                msg = {
+                    'state': {
+                        'desired':
+                            {
+                                'state': 'ON'
+                            }
                     }
+                }
 
-                    msg['state']['desired']['state'] = power_state_value
-                    mqtt_msg = json.dumps(msg)
-
+                msg['state']['desired']['state'] = power_state_value
+                mqtt_msg = json.dumps(msg)
+                # Send the state to the Thing Shadow
+                try:
                     response_update = iot_data_aws.update_thing_shadow(thingName=endpoint_id, payload=mqtt_msg.encode())
-                    print('LOG directive.process.power_controller.response_update -----')
-                    print(json.loads(response_update))
-
-                    alexa_response = AlexaResponse(
-                        token=token,
-                        correlation_token=correlation_token,
-                        endpoint_id=endpoint_id)
-
-                    alexa_response.add_context_property(
-                        namespace='Alexa.PowerController',
-                        name='powerState',
-                        value=power_state_value)
-
+                    print('LOG api_handler_directive.process.power_controller.response_update -----')
+                    print(response_update)
+                    alexa_response = AlexaResponse(token=token, correlation_token=correlation_token, endpoint_id=endpoint_id)
+                    alexa_response.add_context_property(namespace='Alexa.PowerController', name='powerState', value=power_state_value)
                     alexa_response.add_context_property()
-
                     response = alexa_response.get()
 
                 except ClientError as e:
-                    print('ERR directive.process.power_controller Exception:ClientError:', e)
+                    print('ERR api_handler_directive.process.power_controller Exception:ClientError:', e)
                     response = AlexaResponse(name='ErrorResponse', message=e).get()
 
             if namespace == "Alexa.ModeController":
@@ -269,8 +262,8 @@ class ApiHandlerDirective:
                     try:
                         response = iot_data_aws.get_thing_shadow(thingName=endpoint_id)
                         payload = json.loads(response['payload'].read())
-                        reported_range_value = payload['state']['reported']['rangeValue']
-                        print('LOG directive.process.range_controller.range_value:', reported_range_value)
+                        reported_range_value = payload['state']['reported'][instance + '.rangeValue']
+                        print('LOG api_handler_directive.process.range_controller.range_value:', reported_range_value)
                     except ClientError as e:
                         print(e)
                     except KeyError as errorKey:
@@ -279,7 +272,7 @@ class ApiHandlerDirective:
                     new_range_value = reported_range_value + range_value_delta
 
                     if instance == "SampleManufacturer.Endpoint.Heat":
-                        # Forcing into a value but you could respond with an ErrorResponse of VALUE_OUT_OF_RANGE type
+                        # NOTE Forcing into a value 1-6 but you could respond with an ErrorResponse of VALUE_OUT_OF_RANGE type
                         value = max(min(new_range_value, 6), 1)
 
                 if name == "SetRangeValue":
@@ -295,20 +288,54 @@ class ApiHandlerDirective:
                             value=value)
 
                 # Update the Thing Shadow
-                msg = {'state': {'desired': {'rangeValue': 4}}}
-                msg['state']['desired']['rangeValue'] = value
+                msg = {'state': {'desired': {}}}
+                # NOTE: The instance is used to keep the stored value unique
+                msg['state']['desired'][instance + '.rangeValue'] = value
                 mqtt_msg = json.dumps(msg)
                 response_update = iot_data_aws.update_thing_shadow(thingName=endpoint_id, payload=mqtt_msg.encode())
-                print('LOG directive.process.range_controller.response_update -----')
+                print('LOG api_handler_directive.process.range_controller.response_update -----')
                 print(response_update)
 
                 # Send back the response
                 response = alexa_response.get()
 
             if namespace == "Alexa.ToggleController":
-                alexa_error_response = AlexaResponse(name='ErrorResponse')
-                alexa_error_response.set_payload({'type': 'INTERNAL_ERROR', 'message': 'Not Yet Implemented'})
-                response = alexa_error_response.get()
+                name = json_object['directive']['header']['name']
+                correlation_token = json_object['directive']['header']['correlationToken']
+                instance = json_object['directive']['header']['instance']
+                token = json_object['directive']['endpoint']['scope']['token']
+                endpoint_id = json_object['directive']['endpoint']['endpointId']
+
+                # Convert to a local stored state
+                toggle_state_value = 'OFF' if name == "TurnOff" else 'ON'
+                state_name = instance + '.state'
+                msg = {
+                    'state': {
+                        'desired':
+                            {
+                                state_name: 'ON'
+                            }
+                    }
+                }
+                msg['state']['desired'][state_name] = toggle_state_value
+                mqtt_msg = json.dumps(msg)
+                # Send the state to the Thing Shadow
+                try:
+                    response_update = iot_data_aws.update_thing_shadow(thingName=endpoint_id, payload=mqtt_msg.encode())
+                    print('LOG api_handler_directive.process.toggle_controller.response_update -----')
+                    print(response_update)
+                    alexa_response = AlexaResponse(token=token, correlation_token=correlation_token, endpoint_id=endpoint_id)
+                    alexa_response.add_context_property(
+                        namespace='Alexa.ToggleController',
+                        name='toggleState',
+                        instance=instance,
+                        value=toggle_state_value)
+                    alexa_response.add_context_property()
+                    response = alexa_response.get()
+
+                except ClientError as e:
+                    print('ERR api_handler_directive.process.toggle_controller Exception:ClientError:', e)
+                    response = AlexaResponse(name='ErrorResponse', message=e).get()
 
         else:
             alexa_error_response = AlexaResponse(name='ErrorResponse')
@@ -318,14 +345,10 @@ class ApiHandlerDirective:
         if response is None:
             # response set to None indicates an unhandled directive, review the logs
             alexa_error_response = AlexaResponse(name='ErrorResponse')
-            alexa_error_response.set_payload({'type': 'INTERNAL_ERROR', 'message': 'Empty Response: No response processed'})
+            alexa_error_response.set_payload({'type': 'INTERNAL_ERROR', 'message': 'Empty Response: No response processed. Unhandled Directive.'})
             response = alexa_error_response.get()
-        # TODO Validate the Response once the schema is updated
-        # else:
-        # if not self.validate_response(response):
-        #     response = AlexaError(message='Failed to validate message against the schema').get_response()
 
-        print('LOG directive.process.response -----')
+        print('LOG api_handler_directive.process.response -----')
         print(json.dumps(response))
         return response
 
@@ -338,10 +361,10 @@ def validate_response(response):
             validate(response, json_schema)
         valid = True
     except SchemaError as se:
-        print('LOG directive.validate_response: Invalid Schema')
+        print('LOG api_handler_directive.validate_response: Invalid Schema')
         print(se.context)
     except ValidationError as ve:
-        print('LOG directive.validate_response: Invalid Content')
+        print('LOG api_handler_directive.validate_response: Invalid Content')
         print(ve.context)
 
     return valid

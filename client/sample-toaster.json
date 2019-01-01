@@ -1,0 +1,189 @@
+{
+  "event": {
+    "endpoint": {
+      "userId": "INVALID",
+      "friendlyName": "Sample Toaster",
+      "capabilities": [
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa",
+          "version": "3"
+        },
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa.RangeController",
+          "version": "3",
+          "instance": "SampleManufacturer.Endpoint.Heat",
+          "capabilityResources": {
+            "friendlyNames": [
+              {
+                "@type": "text",
+                "value": {
+                  "text": "Heat",
+                  "locale": "en-US"
+                }
+              }
+            ]
+          },
+          "properties": {
+            "supported": [
+              {
+                "name": "rangeValue"
+              }
+            ],
+            "proactivelyReported": true,
+            "retrievable": true
+          },
+          "configuration": {
+            "supportedRange": {
+              "minimumValue": 1,
+              "maximumValue": 7,
+              "precision": 1
+            },
+            "presets": [
+              {
+                "rangeValue": 1,
+                "presetResources": {
+                  "friendlyNames": [
+                    {
+                      "@type": "text",
+                      "value": {
+                        "text": "Light",
+                        "locale": "en-US"
+                      }
+                    },
+                    {
+                      "@type": "asset",
+                      "value": {
+                        "assetId": "Alexa.Value.Minimum"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "rangeValue": 4,
+                "presetResources": {
+                  "friendlyNames": [
+                    {
+                      "@type": "asset",
+                      "value": {
+                        "assetId": "Alexa.Value.Medium"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "rangeValue": 7,
+                "presetResources": {
+                  "friendlyNames": [
+                    {
+                      "@type": "text",
+                      "value": {
+                        "text": "Dark",
+                        "locale": "en-US"
+                      }
+                    },
+                    {
+                      "@type": "asset",
+                      "value": {
+                        "assetId": "Alexa.Value.Maximum"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa.ToggleController",
+          "version": "3",
+          "instance": "SampleManufacturer.Toaster.Bagel",
+          "capabilityResources": {
+            "friendlyNames": [
+              {
+                "@type": "text",
+                "value": {
+                  "text": "Bagel",
+                  "locale": "en-US"
+                }
+              },
+              {
+                "@type": "text",
+                "value": {
+                  "text": "Bagel Mode",
+                  "locale": "en-US"
+                }
+              },
+              {
+                "@type": "text",
+                "value": {
+                  "text": "Bagel Setting",
+                  "locale": "en-US"
+                }
+              }
+            ]
+          },
+          "properties": {
+            "supported": [
+              {
+                "name": "toggleState"
+              }
+            ],
+            "proactivelyReported": false,
+            "retrievable": false
+          }
+        },
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa.ToggleController",
+          "version": "3",
+          "instance": "SampleManufacturer.Toaster.Frozen",
+          "capabilityResources": {
+            "friendlyNames": [
+              {
+                "@type": "text",
+                "value": {
+                  "text": "Frozen",
+                  "locale": "en-US"
+                }
+              },
+              {
+                "@type": "text",
+                "value": {
+                  "text": "Frozen Mode",
+                  "locale": "en-US"
+                }
+              },
+              {
+                "@type": "text",
+                "value": {
+                  "text": "Frozen Setting",
+                  "locale": "en-US"
+                }
+              }
+            ]
+          },
+          "properties": {
+            "supported": [
+              {
+                "name": "toggleState"
+              }
+            ],
+            "proactivelyReported": false,
+            "retrievable": false
+          }
+        }
+      ],
+      "sku": "TT00-AIS-K177",
+      "description": "A Sample Toaster",
+      "manufacturerName": "Sample Manufacturer",
+      "displayCategories": [
+        "OTHER"
+      ]
+    }
+  }
+}

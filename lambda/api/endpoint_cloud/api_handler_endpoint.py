@@ -29,11 +29,11 @@ class ApiHandlerEndpoint:
     class EndpointDetails:
         def __init__(self):
             self.capabilities = ''
-            self.description = ''
-            self.display_categories = ''
+            self.description = 'Sample Description'
+            self.display_categories = 'OTHER'
             self.friendly_name = ApiUtils.get_random_color_string() + ' Sample Endpoint'
             self.id = 'SAMPLE_ENDPOINT_' + ApiUtils.get_code_string(8)
-            self.manufacturer_name = ''
+            self.manufacturer_name = 'Sample Manufacturer'
             self.sku = 'OT00'
             self.user_id = '0'
 
@@ -51,7 +51,7 @@ class ApiHandlerEndpoint:
     @staticmethod
     def add_thing_to_thing_group(thing_name):
         response = iot_aws.add_thing_to_thing_group(thingGroupName=samples_thing_group_name, thingName=thing_name)
-        print('LOG endpoint.add_thing_to_thing_group -----')
+        print('LOG api_handler_endpoint.add_thing_to_thing_group -----')
         print(json.dumps(response))
         return response
 
@@ -65,46 +65,50 @@ class ApiHandlerEndpoint:
                     return True
         return False
 
-    @staticmethod
-    def check_response(response):
-        if response['ResponseMetadata']['HTTPStatusCode'] != 200:
-            print('LOG endpoint.check_response.HTTPStatusCode', response)
-            return False
-        else:
-            return True
-
     def create(self, request):
         try:
             endpoint_details = self.EndpointDetails()
 
             # Map our incoming API body to a thing that will virtually represent a discoverable device for Alexa
             json_object = json.loads(request['body'])
-            endpoint_details.user_id = json_object['event']['endpoint']['userId']  # Expect a Profile
-            endpoint_details.capabilities = json_object['event']['endpoint']['capabilities']
-            endpoint_details.sku = json_object['event']['endpoint']['sku']  # A custom endpoint type, ex: SW01
+            endpoint = json_object['event']['endpoint']
+            endpoint_details.user_id = endpoint['userId']  # Expect a Profile
+            endpoint_details.capabilities = endpoint['capabilities']
+            endpoint_details.sku = endpoint['sku']  # A custom endpoint type, ex: SW01
 
-            endpoint_details.friendly_name = json_object['event']['endpoint']['friendlyName']
-            endpoint_details.manufacturer_name = json_object['event']['endpoint']['manufacturerName']
-            endpoint_details.description = json_object['event']['endpoint']['description']
-            endpoint_details.display_categories = json_object['event']['endpoint']['displayCategories']
+            if 'friendlyName' in endpoint:
+                endpoint_details.friendly_name = endpoint['friendlyName']
+
+            if 'manufacturerName' in endpoint:
+                endpoint_details.manufacturer_name = endpoint['manufacturerName']
+
+            if 'description' in endpoint:
+                endpoint_details.description = endpoint['description']
+
+            if 'displayCategories' in endpoint:
+                endpoint_details.display_categories = endpoint['displayCategories']
 
             # Validate the Samples group is available, if not, create it
             thing_group_name_exists = self.check_thing_group_name_exists()
             if not thing_group_name_exists:
                 response = self.create_thing_group(samples_thing_group_name)
-                # TODO Check response
+                if not ApiUtils.check_response(response):
+                    print('ERR api_handler_endpoint.create.create_thing_group.response', response)
 
             # Create the thing in AWS IoT
             response = self.create_thing(endpoint_details)
-            # TODO Check response
+            if not ApiUtils.check_response(response):
+                print('ERR api_handler_endpoint.create.create_thing.response', response)
 
             # Create the thing details in DynamoDb
             response = self.create_thing_details(endpoint_details)
-            # TODO Check response
+            if not ApiUtils.check_response(response):
+                print('ERR api_handler_endpoint.create.create_thing_details.response', response)
 
             # Add the thing to the Samples Thing Group
             response = self.add_thing_to_thing_group(endpoint_details.id)
-            # TODO Check response
+            if not ApiUtils.check_response(response):
+                print('ERR api_handler_endpoint.create.add_thing_to_thing_group.response', response)
 
             # Send an Event that updates Alexa
             endpoint = {
@@ -126,10 +130,9 @@ class ApiHandlerEndpoint:
             return "KeyError: " + str(key_error)
 
     def create_thing(self, endpoint_details):
-
+        print('LOG api_handler_endpoint.create_thing -----')
         # Create the ThingType if missing
         thing_type_name = self.create_thing_type(endpoint_details.sku)
-
         try:
             response = iot_aws.create_thing(
                 thingName=endpoint_details.id,
@@ -140,7 +143,7 @@ class ApiHandlerEndpoint:
                     }
                 }
             )
-            print('LOG endpoint.create.create_thing -----')
+
             print(json.dumps(response))
             return response
 
@@ -148,52 +151,60 @@ class ApiHandlerEndpoint:
             if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
                 print('WARN iot resource already exists, trying update')
                 return self.update_thing(endpoint_details)
-
         except Exception as e:
             print(e)
+            return None
 
     @staticmethod
     def create_thing_details(endpoint_details):
+        print('LOG api_handler_endpoint.create_thing_details -----')
+        print('LOG api_handler_endpoint.create_thing_details.endpoint_details', endpoint_details.dump())
         dynamodb_aws_resource = boto3.resource('dynamodb')
         table = dynamodb_aws_resource.Table('SampleEndpointDetails')
-        response = table.update_item(
-            Key={
-                'EndpointId': endpoint_details.id
-            },
-            UpdateExpression='SET \
-                    Capabilities = :capabilities, \
-                    Description = :description, \
-                    DisplayCategories = :display_categories, \
-                    FriendlyName = :friendly_name, \
-                    ManufacturerName = :manufacturer_name, \
-                    SKU = :sku, \
-                    UserId = :user_id',
-            ExpressionAttributeValues={
-                ':capabilities': str(json.dumps(endpoint_details.capabilities)),
-                ':description': str(endpoint_details.description),
-                ':display_categories': str(json.dumps(endpoint_details.display_categories)),
-                ':friendly_name': str(endpoint_details.friendly_name),
-                ':manufacturer_name': str(endpoint_details.manufacturer_name),
-                ':sku': str(endpoint_details.sku),
-                ':user_id': str(endpoint_details.user_id)
+        print('LOG api_handler_endpoint.create_thing_details Updating Item in SampleEndpointDetails')
+        try:
+            response = table.update_item(
+                Key={
+                    'EndpointId': endpoint_details.id
+                },
+                UpdateExpression='SET \
+                        Capabilities = :capabilities, \
+                        Description = :description, \
+                        DisplayCategories = :display_categories, \
+                        FriendlyName = :friendly_name, \
+                        ManufacturerName = :manufacturer_name, \
+                        SKU = :sku, \
+                        UserId = :user_id',
+                ExpressionAttributeValues={
+                    ':capabilities': str(json.dumps(endpoint_details.capabilities)),
+                    ':description': str(endpoint_details.description),
+                    ':display_categories': str(json.dumps(endpoint_details.display_categories)),
+                    ':friendly_name': str(endpoint_details.friendly_name),
+                    ':manufacturer_name': str(endpoint_details.manufacturer_name),
+                    ':sku': str(endpoint_details.sku),
+                    ':user_id': str(endpoint_details.user_id)
 
-            }
-        )
-        print('LOG endpoint.create_thing_details -----')
-        print(json.dumps(response))
-        return response
+                }
+            )
+            print(json.dumps(response))
+            return response
+        except Exception as e:
+            print(e)
+            return None
+
 
     @staticmethod
     def create_thing_group(thing_group_name):
+        print('LOG api_handler_endpoint.create_thing_group -----')
         response = iot_aws.create_thing_group(
             thingGroupName=thing_group_name
         )
-        print('LOG endpoint.create_thing_group -----')
         print(json.dumps(response))
         return response
 
     @staticmethod
     def create_thing_type(sku):
+        print('LOG api_handler_endpoint.create_thing_type -----')
         # Set the default at OTHER (OT00)
         thing_type_name = 'SampleOther'
         thing_type_description = 'A sample endpoint'
@@ -210,6 +221,10 @@ class ApiHandlerEndpoint:
             thing_type_name = 'SampleSwitch'
             thing_type_description = 'A sample switch endpoint'
 
+        if sku.upper().startswith('TT'):
+            thing_type_name = 'SampleToaster'
+            thing_type_description = 'A sample toaster endpoint'
+
         response = {}
         try:
             response = iot_aws.create_thing_type(
@@ -221,7 +236,6 @@ class ApiHandlerEndpoint:
         except ClientError as e:
             print(e, e.response)
 
-        print('LOG endpoint.create_thing_type -----')
         print(json.dumps(response))
         return thing_type_name
 
@@ -272,14 +286,14 @@ class ApiHandlerEndpoint:
             TableName='SampleEndpointDetails',
             Key={'EndpointId': {'S': endpoint_id}}
         )
-        print('LOG endpoint.delete_thing.dynamodb_aws.delete_item.response -----')
+        print('LOG api_handler_endpoint.delete_thing.dynamodb_aws.delete_item.response -----')
         print(response)
 
         # Delete from AWS IoT
         response = iot_aws.delete_thing(
             thingName=endpoint_id
         )
-        print('LOG endpoint.delete_thing.iot_aws.delete_item.response -----')
+        print('LOG api_handler_endpoint.delete_thing.iot_aws.delete_item.response -----')
         print(response)
         return response
 
@@ -303,7 +317,7 @@ class ApiHandlerEndpoint:
                         for thing in things:
                             response.append(thing)
 
-            print('LOG endpoint.read -----')
+            print('LOG api_handler_endpoint.read -----')
             print(json.dumps(response))
             return response
 

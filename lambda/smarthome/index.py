@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-# Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use this file except in
 # compliance with the License. A copy of the License is located at
@@ -52,9 +52,10 @@ def handler(request, context):
         return response
 
     except HTTPError as error:
-        print("ERROR skill.index.handler.error:", error)
-        return error
+        error_output = {'code': error.code, 'msg': 'An error occurred while handling a request to /directives. Also review the Endpoint API logs.'}
+        print("ERROR skill.index.handler.error:", error_output)
+        return error_output
 
     except ValueError as error:
         print("ERROR skill.index.handler.error:", error)
-        return error
+        return {'error': error}

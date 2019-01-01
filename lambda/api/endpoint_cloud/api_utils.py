@@ -19,6 +19,17 @@ import string
 class ApiUtils:
 
     @staticmethod
+    def check_response(response):
+        if response is None:
+            print('ERR ApiUtils.check_response is None')
+            return False
+        if response['ResponseMetadata']['HTTPStatusCode'] != 200:
+            print('ERR ApiUtils.check_response.HTTPStatusCode', response)
+            return False
+        else:
+            return True
+
+    @staticmethod
     def get_time_utc():
         """
         An ISO 8601 formatted string in UTC (e.g. YYYY-MM-DDThh:mm:ss.sD)

@@ -1,0 +1,741 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "UseDefaults": {
+      "Type": "String",
+      "Default": false,
+      "Description": "Whether to initialize with the default device endpoints."
+    },
+    "VendorId": {
+      "Type": "String",
+      "Default": "XXXXXXXXXXXXXX",
+      "Description": "The associated Vendor ID for the services."
+    },
+    "ClientId": {
+      "Type": "String",
+      "Default": "amzn1.application-oa2-client.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "Description": "The Client ID of the sample application. Get this value from your Application Security Profile."
+    },
+    "ClientSecret": {
+      "Type": "String",
+      "Default": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "Description": "The Client Secret of the sample application. Get this value from your Application Security Profile."
+    },
+    "AccessToken": {
+      "Type": "String",
+      "Default": "Atza|...",
+      "Description": "An Access Token (Get manually or use ASK CLI)"
+    },
+    "RefreshToken": {
+      "Type": "String",
+      "Default": "Atzr|...",
+      "Description": "A Refresh Token (Get manually or use ASK CLI)"
+    }
+  },
+  "Resources": {
+    "EndpointRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "Endpoint Cloud",
+        "Description": "An Endpoint Cloud"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "d8f2cbf2-b078-4a55-af97-8529c63802a1"
+        }
+      },
+      "DependsOn": []
+    },
+    "EndpointLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "endpoint-code",
+          "S3Key": "endpoint-index-python37.zip"
+        },
+        "Description": "API Lambda to communicate with Endpoints",
+        "Environment": {
+          "Variables": {
+            "api_id": {
+              "Ref": "EndpointRestApi"
+            },
+            "client_id": "Get this value from Alexa Skill Permissions",
+            "client_secret": "Get this value from Alexa Skill Permissions"
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "EndpointLambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Timeout": "6"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "e72bad17-15cb-4c76-9f2c-75082b95e2f2"
+        }
+      }
+    },
+    "EndpointsResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "EndpointRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "endpoints",
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "d1cfcc76-4e56-40d6-bee4-b1f0b2151636"
+        }
+      }
+    },
+    "EndpointLambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+        ],
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "EndpointLambdaExecutionRolePolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "execute-api:Invoke"
+                  ],
+                  "Resource": "arn:aws:execute-api:*:*:*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "iot:AddThingToThingGroup",
+                    "iot:CreateThing",
+                    "iot:CreateThingGroup",
+                    "iot:CreateThingType",
+                    "iot:DescribeThing",
+                    "iot:GetThingShadow",
+                    "iot:ListThings",
+                    "iot:ListThingGroups",
+                    "iot:UpdateThing",
+                    "iot:UpdateThingShadow"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "RoleName": "EndpointLambdaExecutionRole"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "a14a9328-385c-45aa-a29d-a61b8d7e3772"
+        }
+      }
+    },
+    "EndpointApiDeploymentProd": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        },
+        "StageName": "prod"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "e8c0152e-8429-4b8f-9598-191d6cce7e3f"
+        }
+      },
+      "DependsOn": [
+        "EndpointsMethodGet",
+        "DirectivesMethodPost",
+        "EventsMethodPost",
+        "EndpointsMethodPost"
+      ]
+    },
+    "EndpointApiPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "EndpointLambda",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "EndpointRestApi"
+              },
+              "/*/*/*"
+            ]
+          ]
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "afbd5395-df05-4a4c-a601-8ce08b46bcce"
+        }
+      }
+    },
+    "DirectivesResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "EndpointRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "directives",
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "fa89ca5f-72f3-4ce3-bbb9-91f310a15074"
+        }
+      }
+    },
+    "EndpointsMethodGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        },
+        "ResourceId": {
+          "Ref": "EndpointsResource"
+        },
+        "HttpMethod": "GET",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EndpointLambda.Arn}/invocations"
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "bfa42395-a1f8-43d0-844d-9e13044c5aca"
+        }
+      }
+    },
+    "DirectivesMethodPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        },
+        "ResourceId": {
+          "Ref": "DirectivesResource"
+        },
+        "HttpMethod": "POST",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EndpointLambda.Arn}/invocations"
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "c31ac23f-2b25-4c28-a219-f6c1ca2a705b"
+        }
+      }
+    },
+    "EndpointDetailsTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "EndpointId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "EndpointId",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "5",
+          "WriteCapacityUnits": "5"
+        },
+        "TableName": "SampleEndpointDetails"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "20cfe202-9d82-45b1-91fa-a021f8506c96"
+        }
+      }
+    },
+    "EventsResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "EndpointRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "events",
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "cc4e52a9-25df-4d31-ad4b-b3ee141b1916"
+        }
+      }
+    },
+    "EventsMethodPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        },
+        "ResourceId": {
+          "Ref": "EventsResource"
+        },
+        "HttpMethod": "POST",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EndpointLambda.Arn}/invocations"
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "2d3a592a-42e6-42a5-a2bb-1748704afce8"
+        }
+      }
+    },
+    "SkillLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "endpoint-code",
+          "S3Key": "skill-index-python37.zip"
+        },
+        "Description": "Skill Lambda to Handle Alexa Directives",
+        "Environment": {
+          "Variables": {
+            "api_id": {
+              "Ref": "EndpointRestApi"
+            }
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "EndpointLambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Timeout": "7"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "b28f24ae-cd93-4a3e-a6ab-6ded346669b6"
+        }
+      },
+      "DependsOn": []
+    },
+    "EndpointsMethodPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "EndpointRestApi"
+        },
+        "ResourceId": {
+          "Ref": "EndpointsResource"
+        },
+        "HttpMethod": "POST",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EndpointLambda.Arn}/invocations"
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "9e21c442-bc71-435d-96b8-6efe8197c753"
+        }
+      }
+    },
+    "UsersTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "UserId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "UserId",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "5",
+          "WriteCapacityUnits": "5"
+        },
+        "TableName": "SampleUsers"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "291865df-5774-4990-91d2-5ccabf280f09"
+        }
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "root",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:AddPermission",
+                    "lambda:RemovePermission",
+                    "lambda:UpdateFunctionConfiguration"
+                  ],
+                  "Resource": "arn:aws:lambda:*:*:function:*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "SetupLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Code": {
+          "S3Bucket": "endpoint-code",
+          "S3Key": "setup-index-python37.zip"
+        },
+        "Runtime": "python3.7",
+        "Timeout": "15"
+      }
+    },
+    "Setup": {
+      "Type": "Custom::Setup",
+      "DependsOn": [
+        "AlexaSkill",
+        "EndpointRestApi"
+      ],
+      "Properties": {
+        "AccessToken": {
+          "Ref": "AccessToken"
+        },
+        "AlexaSkillLambdaPermissionStatementId": {
+          "Ref": "AlexaSkillLambdaPermission"
+        },
+        "EndpointApiId": {
+          "Ref": "EndpointRestApi"
+        },
+        "EndpointLambda": {
+          "Fn::GetAtt": [
+            "EndpointLambda",
+            "Arn"
+          ]
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SetupLambda",
+            "Arn"
+          ]
+        },
+        "SkillId": {
+          "Ref": "AlexaSkill"
+        },
+        "SkillLambda": {
+          "Fn::GetAtt": [
+            "SkillLambda",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AlexaSkillLambdaPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:invokeFunction",
+        "FunctionName": {
+          "Ref": "SkillLambda"
+        },
+        "Principal": "alexa-connectedhome.amazon.com"
+      }
+    },
+    "AlexaSkill": {
+      "Type": "Alexa::ASK::Skill",
+      "DependsOn": "AlexaSkillLambdaPermission",
+      "Properties": {
+        "SkillPackage": {
+          "S3Bucket": "endpoint-code",
+          "S3Key": "skill-sample-python-smarthome-sandbox.zip",
+          "Overrides": {
+            "Manifest": {
+              "apis": {
+                "smartHome": {
+                  "endpoint": {
+                    "uri": {
+                      "Fn::GetAtt": [
+                        "SkillLambda",
+                        "Arn"
+                      ]
+                    }
+                  },
+                  "regions": {
+                    "NA": {
+                      "endpoint": {
+                        "uri": {
+                          "Fn::GetAtt": [
+                            "SkillLambda",
+                            "Arn"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "AuthenticationConfiguration": {
+          "ClientId": {
+            "Ref": "ClientId"
+          },
+          "ClientSecret": {
+            "Ref": "ClientSecret"
+          },
+          "RefreshToken": {
+            "Ref": "RefreshToken"
+          }
+        },
+        "VendorId": {
+          "Ref": "VendorId"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "AccessToken": {
+      "Description": "The Access Token",
+      "Value": {
+        "Ref": "AccessToken"
+      },
+      "Export": {
+        "Name": "access-token"
+      }
+    },
+    "AlexaSkillId": {
+      "Description": "The Alexa Skill ID",
+      "Value": {
+        "Ref": "AlexaSkill"
+      },
+      "Export": {
+        "Name": "alexa-skill-id"
+      }
+    },
+    "ClientId": {
+      "Description": "The Client ID",
+      "Value": {
+        "Ref": "ClientId"
+      },
+      "Export": {
+        "Name": "client-id"
+      }
+    },
+    "ClientSecret": {
+      "Description": "The Client Secret",
+      "Value": {
+        "Ref": "ClientSecret"
+      },
+      "Export": {
+        "Name": "client-secret"
+      }
+    },
+    "EndpointApiId": {
+      "Description": "The Endpoint API ID",
+      "Value": {
+        "Ref": "EndpointRestApi"
+      },
+      "Export": {
+        "Name": "endpoint-api-id"
+      }
+    },
+    "EndpointApiUrl": {
+      "Description": "The Endpoint API URL",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "EndpointRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".amazonaws.com/prod/"
+          ]
+        ]
+      },
+      "Export": {
+        "Name": "endpoint-api-url"
+      }
+    },
+    "EndpointApiAuthRedirectUrl": {
+      "Description": "The Endpoint API Auth-Redirect URL",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "EndpointRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".amazonaws.com/prod/auth-redirect"
+          ]
+        ]
+      },
+      "Export": {
+        "Name": "endpoint-api-auth-redirect-url"
+      }
+    },
+    "SkillLambdaArn": {
+      "Description": "The Alexa Smart Home Skill Lambda ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "SkillLambda",
+          "Arn"
+        ]
+      },
+      "Export": {
+        "Name": "skill-lambda-id"
+      }
+    }
+  }
+}

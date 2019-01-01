@@ -72,10 +72,13 @@ def handler(request, context):
         if http_method == 'POST' and resource == '/directives':
             response = api_handler.directive.process(request, env_client_id, env_client_secret, get_api_url(env_api_id, env_aws_default_region, 'auth-redirect'))
             if response['event']['header']['name'] == 'ErrorResponse':
+                error_message = response['event']['payload']['message']['error_description']
                 api_response.statusCode = 500
+                api_response.body = ApiResponseBody(result="ERR", message=error_message)
+                return api_response.get()
             else:
                 api_response.statusCode = 200
-            api_response.body = json.dumps(response)
+                api_response.body = json.dumps(response)
 
         # POST to endpoints : Create an Endpoint
         if http_method == 'POST' and resource == '/endpoints':

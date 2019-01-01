@@ -1,0 +1,35 @@
+{
+  "event": {
+    "endpoint": {
+      "userId": "INVALID",
+      "friendlyName": "White Sample Switch",
+      "capabilities": [
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa",
+          "version": "3"
+        },
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa.PowerController",
+          "version": "3",
+          "properties": {
+            "supported": [
+              {
+                "name": "powerState"
+              }
+            ],
+            "proactivelyReported": true,
+            "retrievable": true
+          }
+        }
+      ],
+      "sku": "SW01-S3M-KR76",
+      "description": "A Sample Switch",
+      "manufacturerName": "Sample Manufacturer",
+      "displayCategories": [
+        "SWITCH"
+      ]
+    }
+  }
+}

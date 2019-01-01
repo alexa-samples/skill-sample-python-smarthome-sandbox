@@ -155,6 +155,10 @@ class ApiHandlerEvent:
             sku_details['description'] = 'A sample microwave endpoint'
             sku_details['display_categories'] = ["MICROWAVE"]
 
+        if sku.upper().startswith('TT'):
+            sku_details['description'] = 'A sample toaster endpoint'
+            sku_details['display_categories'] = ["OTHER"]
+
         if sku.upper().startswith('SW'):
             sku_details['description'] = 'A sample switch endpoint'
             sku_details['display_categories'] = ["SWITCH"]
@@ -162,6 +166,7 @@ class ApiHandlerEvent:
         return sku_details
 
     def get_user_info(self, endpoint_user_id):
+        print('LOG event.create.get_user_info -----')
         table = boto3.resource('dynamodb').Table('SampleUsers')
         result = table.get_item(
             Key={
@@ -181,10 +186,13 @@ class ApiHandlerEvent:
 
         if result['ResponseMetadata']['HTTPStatusCode'] == 200:
             if 'Item' in result:
-                print('LOG event.create.send_event.SampleUsers.get_item -----')
+                print('LOG event.create.get_user_info.SampleUsers.get_item -----')
                 print(str(result['Item']))
-                expiration_utc = result['Item']['ExpirationUTC']
-                token_is_expired = self.is_token_expired(expiration_utc)
+                if 'ExpirationUTC' in result['Item']:
+                    expiration_utc = result['Item']['ExpirationUTC']
+                    token_is_expired = self.is_token_expired(expiration_utc)
+                else:
+                    token_is_expired = True
                 print('LOG event.create.send_event.token_is_expired:', token_is_expired)
                 if token_is_expired:
                     # The token has expired so get a new access token using the refresh token

@@ -1,0 +1,35 @@
+{
+  "event": {
+    "endpoint": {
+      "userId": "INVALID",
+      "friendlyName": "Black Sample Switch",
+      "capabilities": [
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa",
+          "version": "3"
+        },
+        {
+          "type": "AlexaInterface",
+          "interface": "Alexa.PowerController",
+          "version": "3",
+          "properties": {
+            "supported": [
+              {
+                "name": "powerState"
+              }
+            ],
+            "proactivelyReported": true,
+            "retrievable": true
+          }
+        }
+      ],
+      "sku": "SW00-S3M-KR75",
+      "description": "A Sample Switch",
+      "manufacturerName": "Sample Manufacturer",
+      "displayCategories": [
+        "SWITCH"
+      ]
+    }
+  }
+}

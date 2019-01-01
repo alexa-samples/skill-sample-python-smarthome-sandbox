@@ -1,0 +1,57 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "A sample smart home sandbox Alexa skill.",
+          "examplePhrases": [
+            "Alexa turn on white sample switch",
+            "Alexa turn off black sample switch",
+            "Alexa set sample toaster heat to six"
+          ],
+          "name": "Smart Home Sandbox",
+          "description": "This is a Sample Smart Home Skill Sandbox."
+        }
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "Interact with the virtual device templates.",
+      "category": "SMART_HOME",
+      "distributionCountries": [
+        "US"
+      ]
+    },
+    "apis": {
+      "smartHome": {
+        "endpoint": {
+          "uri": "SkillLambda"
+        },
+        "regions": {
+          "NA": {
+            "endpoint": {
+              "uri": "SkillLambda"
+            }
+          }
+        },
+        "protocolVersion": "3"
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::async_event:write"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://www.amazon.com/gp/help/customer/display.html?nodeId=468496"
+        }
+      },
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    }
+  }
+}

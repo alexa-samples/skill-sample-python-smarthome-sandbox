@@ -1,6 +1,6 @@
-## Skill Sample Python Smarthome Iot
+## Skill Sample Python Smarthome Sandbox
 
-This is Alexa skill sample code for showing how several areas of a Smart Home model come together to define and provide endpoint devices with AWS IoT
+This is Alexa skill sample code for showing how several areas of a Smart Home model come together to define and provide endpoint devices using Lambda, IoT Core, DynamoDB, and API Gateway services.
 
 To get started, follow the [instructions](instructions/README.md).
 

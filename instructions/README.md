@@ -1,13 +1,14 @@
-# Build an Alexa Smart Home Skill and Backend
+# Build an Alexa Smart Home Skill Sandbox
 
+These instructions are to build a sample Alexa skill that uses AWS services to store properties of virtual devices. In the course of these instructions you will create the Alexa skill and supporting backend to handle the requests from Alexa and provide responses based on user input.
 
+## Automated Instructions
 
-## Instructions
+The fastest way to get up and running is to follow the automated instructions for [creating a Sandbox](create-sandbox.md).
 
-These instructions are to build a sample Alexa skill that uses AWS IoT to store properties of virtual devices. In the course of these instructions you will create the Alexa skill and supporting backend to handle the requests from Alexa and provide responses based on user input.
+## Manual Instructions
 
-Begin by following the steps in order.
-
+For the manual instructions, follow these steps in order.
 
 1. [Verify Requirements](01-verify-requirements.md)
 2. [Create the Smart Home Skill Backend](02-create-the-backend.md)

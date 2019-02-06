@@ -11,7 +11,9 @@ To see your Vendor ID, go to https://developer.amazon.com/mycid.html and sign in
 <span style="color:#ccc">2.2</span> Click on **Create a New Security Profile** and enter the following values:
 
 For the Security Profile Name: `Smart Home Sandbox`
+
 For the Security Profile Description: `A sample sandbox for Alexa skill development`.
+
 For the Consent Privacy Notice URL: `https://example.com/privacy.html`
 
 <span style="color:#ccc">2.3</span> Click the **Save** button.
@@ -28,13 +30,16 @@ http://127.0.0.1:9090/cb
 > Leave the page open to copy the Client ID and Secret
 
 ### <span style="color:#aaa">3</span> Download the Source
-3.1 Clone the source into  working directory: `git clone https://github.com/alexa/skill-sample-python-smarthome-sandbox` 
+3.1 Clone the source into a working directory using the command: `git clone https://github.com/alexa/skill-sample-python-smarthome-sandbox` 
 > Optionally [download the master branch as a zip](https://github.com/alexa/skill-sample-python-smarthome-sandbox/archive/master.zip) and extract it to a working directory.
 
 ### <span style="color:#aaa">4</span> Run the client script
 4.1 From the command line, navigate to the cloned repository `skill-sample-python-smarthome-sandbox/client` folder.
+
 4.2 Within the */client* folder, run `pip install boto3`
+
 4.3 To run the sandbox, then run `python sandbox.py`
+
 4.4 Enter the Vendor ID, LWA Client ID, and LWA Client Secret when prompted
 	 
 ### <span style="color:#aaa">5</span> Enable the skill
@@ -42,6 +47,7 @@ http://127.0.0.1:9090/cb
 
 ### <span style="color:#aaa">6</span> Test the skill
 6.1 Go to https://developer.amazon.com/alexa/console/ask/ and open the **Smart Home Sandbox** skill.
+
 6.2 Navigate to the **Test** tab and try some of the following commands with Alexa:
 ```
 turn on black switch

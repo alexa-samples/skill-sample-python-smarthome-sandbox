@@ -373,6 +373,7 @@
                                     "Action": [
                                         "iot:AddThingToThingGroup",
                                         "iot:CreateThing",
+                                        "iot:CreateThingType",
                                         "iot:CreateThingGroup",
                                         "iot:DescribeThing",
                                         "iot:GetThingShadow",
@@ -530,13 +531,13 @@
             "Properties": {
                 "AttributeDefinitions": [
                     {
-                        "AttributeName": "DetailsId",
+                        "AttributeName": "EndpointId",
                         "AttributeType": "S"
                     }
                 ],
                 "KeySchema": [
                     {
-                        "AttributeName": "DetailsId",
+                        "AttributeName": "EndpointId",
                         "KeyType": "HASH"
                     }
                 ],

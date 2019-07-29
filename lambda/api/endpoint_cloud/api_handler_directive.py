@@ -26,6 +26,10 @@ dynamodb_aws = boto3.client('dynamodb')
 iot_aws = boto3.client('iot')
 iot_data_aws = boto3.client('iot-data')
 
+DEFAULT_VAL = {
+    'Alexa.RangeController': 1,
+    'Alexa.PowerController': 'OFF'
+}
 
 class ApiHandlerDirective:
 
@@ -56,13 +60,41 @@ class ApiHandlerDirective:
                 if name == 'ReportState':
                     # Get the User ID from the access_token
                     response_user_id = json.loads(ApiAuth.get_user_id(token).read().decode('utf-8'))
-
-                    # TODO Lookup the endpoint and get state
-
+                    result = dynamodb_aws.get_item(TableName='SampleEndpointDetails', Key={'EndpointId': {'S': endpoint_id}})
+                    capabilities_string = self.get_db_value(result['Item']['Capabilities'])
+                    capabilities = json.loads(capabilities_string)
+                    props=[]
+                    for c in capabilities:
+                        if not 'properties' in c:
+                            continue
+                        retrievable = c['properties'].get('retrievable', False)
+                        if retrievable:
+                            props.append(c)
+                    state = {}   
+                    try: 
+                        res = iot_data_aws.get_thing_shadow(thingName=endpoint_id)
+                        shadow=json.loads(res['payload'].read())
+                        state = shadow['state']['desired']
+                    except ClientError as e:
+                        print('LOG ', e)
+                        
+                    
                     print('Sending StateReport for', response_user_id, 'on endpoint', endpoint_id)
                     statereport_response = AlexaResponse(name='StateReport', endpoint_id=endpoint_id, correlation_token=correlation_token, token=token)
+                    
+                    for p in props:
+                        key = p['properties']['supported'][0]['name']
+                        if 'instance' in p:
+                            key = p['instance']+'.'+key
+                        current_state = state.get(key, DEFAULT_VAL[p['interface']])
+                        if 'instance' in p:
+                            statereport_response.add_context_property(namespace=p['interface'],
+                                name=p['properties']['supported'][0]['name'], value=current_state,
+                                instance=p['instance'])
+                        else: 
+                            statereport_response.add_context_property(namespace=p['interface'],
+                                name=p['properties']['supported'][0]['name'], value=current_state)
 
-                    # TODO Add Context Properties for each reportable state
 
                     response = statereport_response.get()
 
@@ -190,7 +222,10 @@ class ApiHandlerDirective:
                             adr.add_payload_endpoint(
                                 friendly_name=endpoint_details.friendly_name,
                                 endpoint_id=endpoint_details.id,
-                                capabilities=endpoint_details.capabilities)
+                                capabilities=endpoint_details.capabilities,
+                                display_categories=endpoint_details.display_categories,
+                                manufacturer_name=endpoint_details.manufacturer_name
+                                )
 
                 response = adr.get()
 
@@ -214,12 +249,12 @@ class ApiHandlerDirective:
                     'state': {
                         'desired':
                             {
-                                'state': 'ON'
+                                'powerState': 'ON'
                             }
                     }
                 }
 
-                msg['state']['desired']['state'] = power_state_value
+                msg['state']['desired']['powerState'] = power_state_value
                 mqtt_msg = json.dumps(msg)
                 # Send the state to the Thing Shadow
                 try:
@@ -246,7 +281,18 @@ class ApiHandlerDirective:
                 instance = json_object['directive']['header']['instance']
                 token = json_object['directive']['endpoint']['scope']['token']
                 endpoint_id = json_object['directive']['endpoint']['endpointId']
-
+                
+                result = dynamodb_aws.get_item(TableName='SampleEndpointDetails', Key={'EndpointId': {'S': endpoint_id}})
+                capabilities_string = self.get_db_value(result['Item']['Capabilities'])
+                capabilities = json.loads(capabilities_string)
+                
+                for c in capabilities:
+                    if 'instance' in c and c['instance'] == instance:
+                        MIN_VAL = c['configuration']['supportedRange']['minimumValue']
+                        MAX_VAL = c['configuration']['supportedRange']['maximumValue']
+                        PREC = c['configuration']['supportedRange']['precision']
+                        break
+                
                 alexa_response = AlexaResponse(endpoint_id=endpoint_id, correlation_token=correlation_token, token=token)
                 value = 0
                 if name == "AdjustRangeValue":
@@ -256,7 +302,7 @@ class ApiHandlerDirective:
 
                     # Check to see if we need to use the delta default value (The user did not give a precision)
                     if range_value_delta_default:
-                        range_value_delta = 1.0
+                        range_value_delta = PREC
 
                     # Lookup the existing value of the endpoint by endpoint_id and limit ranges as appropriate - for this sample, expecting 1-6
                     try:
@@ -271,21 +317,16 @@ class ApiHandlerDirective:
 
                     new_range_value = reported_range_value + range_value_delta
 
-                    if instance == "SampleManufacturer.Endpoint.Heat":
-                        # NOTE Forcing into a value 1-6 but you could respond with an ErrorResponse of VALUE_OUT_OF_RANGE type
-                        value = max(min(new_range_value, 6), 1)
+                    value = max(min(new_range_value, MAX_VAL), MIN_VAL)
 
                 if name == "SetRangeValue":
                     range_value = json_object['directive']['payload']['rangeValue']
 
-                    # Set the range value as appropriate - for this sample, expecting 1-6
-                    if instance == "SampleManufacturer.Endpoint.Heat":
-                        # Forcing into a value but you could respond with an ErrorResponse of VALUE_OUT_OF_RANGE type
-                        value = max(min(range_value, 6), 1)
-                        alexa_response.add_context_property(
-                            namespace='Alexa.RangeController',
-                            name='rangeValue',
-                            value=value)
+                    value = max(min(range_value, MAX_VAL), MIN_VAL)
+                    alexa_response.add_context_property(
+                        namespace='Alexa.RangeController',
+                        name='rangeValue',
+                        value=value)
 
                 # Update the Thing Shadow
                 msg = {'state': {'desired': {}}}

@@ -79,7 +79,13 @@ class ApiHandlerEvent:
                 try:
                     state = json_object['event']['endpoint']['state']  # Expect a string, ex: powerState
                     state_value = json_object['event']['endpoint']['value']  # Expect string or JSON
-
+                    namespace = json_object['event']['endpoint']['namespace']
+                    instance = json_object['event']['endpoint'].get('instance', None)
+                    if instance:
+                        state = instance+'.'+state
+                        prop = AlexaResponse.create_context_property(instance=instance, namespace=namespace, name=state, value=state_value)
+                    else:
+                        prop = AlexaResponse.create_context_property(namespace=namespace, name=state, value=state_value)
                     # Update the IoT Thing Shadow state
                     msg = {
                         'state': {
@@ -106,7 +112,7 @@ class ApiHandlerEvent:
                                     'type': 'PHYSICAL_INTERACTION'
                                 },
                                 "properties": [
-                                    AlexaResponse.create_context_property(name=state, value=state_value)
+                                    prop
                                 ]
                             }
                         }

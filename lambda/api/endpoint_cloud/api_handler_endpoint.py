@@ -99,7 +99,7 @@ class ApiHandlerEndpoint:
             response = self.create_thing(endpoint_details)
             if not ApiUtils.check_response(response):
                 print('ERR api_handler_endpoint.create.create_thing.response', response)
-
+                
             # Create the thing details in DynamoDb
             response = self.create_thing_details(endpoint_details)
             if not ApiUtils.check_response(response):
@@ -113,7 +113,7 @@ class ApiHandlerEndpoint:
             # Send an Event that updates Alexa
             endpoint = {
                 'userId': endpoint_details.user_id,
-                'id': 'SAMPLE_ENDPOINT_' + ApiUtils.get_code_string(8),
+                'id': endpoint_details.id,
                 'friendlyName': endpoint_details.friendly_name,
                 'sku': endpoint_details.sku,
                 'capabilities': endpoint_details.capabilities
@@ -154,7 +154,7 @@ class ApiHandlerEndpoint:
         except Exception as e:
             print(e)
             return None
-
+            
     @staticmethod
     def create_thing_details(endpoint_details):
         print('LOG api_handler_endpoint.create_thing_details -----')

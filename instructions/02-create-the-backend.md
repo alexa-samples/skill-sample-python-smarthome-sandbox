@@ -7,7 +7,7 @@ These instructions create the backend services needed by the Smart Home Skill us
 
 <span style="color:#ccc">2.1.2</span> Verify you are in the N. Virginia (us-east-1) region and click the **Create Stack** button.
 
-<span style="color:#ccc">2.1.3</span> In the _Specify Template_ section, select the **Amazon S3 template URL** radio button and enter the following URL `https://s3.amazonaws.com/endpoint-code-us/backend.template` into the S3 URL field.
+<span style="color:#ccc">2.1.3</span> In the _Specify Template_ section, select the **Upload a template file** radio button and and upload backend.template downlaoded from ` https://github.com/alexa-samples/skill-sample-python-smarthome-sandbox/tree/master/cloudformation` Before uplaoding update the backend.template with latest python version to avoid and errors.
 
 <span style="color:#ccc">2.1.4</span> Click **Next** on the bottom right of the page.
 
